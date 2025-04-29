@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <string>
+#include <vector>
 
 class User
 {
@@ -9,16 +10,22 @@ class User
 	// Add your code here
 
 public:
+	User();
 	User(std::string identifier, std::string name, int age, std::string country, double rateOfActivity);
-	std::ofstream GetUserData() const;
-
-	 
+	std::string GetUserData() const;
+	bool AddFriend(User* user);
+	std::vector<User*>& GetFriends();
+	
+	std::string& GetIdentifier();
+	std::string& GetName();
 private:
-	std::string _identifier;
+	std::string _identifier = "";
 	std::string _name;
 	int _age;
 	std::string _country;
-	double _rateOfActivity;
-	User* _friendList[1000];
+	float _rateOfActivity;
+
+	std::vector<User*> _friends;
+	
 	// Add your code here
 };
