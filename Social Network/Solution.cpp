@@ -30,6 +30,13 @@ bool Solution::processCommand(const std::string& commandString) {
 		inString >> identifier;
 		return ListFriends(identifier);
 	}
+	else if (command == "ListMutuals")
+	{
+		std::string identifier, identifier2;
+		inString >> identifier;
+		inString >> identifier2;
+		return ListMutuals(identifier, identifier2);
+	}
 
 	return false;
 }
@@ -46,7 +53,30 @@ bool Solution::ViewProfile(const std::string& identifier)
 
 	return true;
 }
-
+bool Solution::ListMutuals(const std::string& identifier1, const std::string& identifier2)
+{
+	_outFile << "ListMutuals " << identifier1 << " " << identifier2 << std::endl;
+	std::vector<User*> mutuals;
+	int mutualCount = 0;
+	for (User* friendptr : GetUser(identifier1)->GetFriends())
+	{
+		for (User* friendptr2 : GetUser(identifier2)->GetFriends())
+		{
+			if (friendptr->GetIdentifier() == friendptr2->GetIdentifier())
+			{
+				mutuals.push_back(friendptr);
+				mutualCount++;
+			}
+		}
+	}
+	_outFile << mutualCount << " Mutual friend(s) found. " << std::endl;
+	for (User* friendptr : mutuals)
+	{
+		_outFile << friendptr->GetName() << " [" << friendptr->GetIdentifier() << "]" << std::endl;
+	}
+	_outFile << std::endl;
+	return true;
+}
 User* Solution::GetUser(const std::string& identifier)
 {
 	for (int i = 0; i < _users.size(); i++)
