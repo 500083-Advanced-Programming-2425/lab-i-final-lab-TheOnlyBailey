@@ -39,3 +39,15 @@ Whitney Garcia [D02598C4]
 Kent Reed [6A0E4C44]
 
 ListMutuals 73D0EF96 8A4ECF3A
+3 Mutual friend(s) found. 
+Andrew Washington [B3E14885]
+Brian Watson [43B06C7F]
+Bridget Miller [DFA5F822]
+
+ViewProfile A205E5BA
+Name: Naomi Young
+Age: 74
+Country: Netherlands
+Activity Rate: 18%
+Friends: 24
+

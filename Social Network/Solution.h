@@ -19,6 +19,7 @@ public:
 	bool ViewProfile(const std::string& ientifier);
 	bool ListFriends(const std::string& identifier);
 	bool ListMutuals(const std::string& identifier1, const std::string& identifier2);
+	bool FindSeperation(const std::string& identifier1, const std::string& identifier2);
 	User* GetUser(const std::string& identifier);
 
 

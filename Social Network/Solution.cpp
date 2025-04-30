@@ -37,6 +37,13 @@ bool Solution::processCommand(const std::string& commandString) {
 		inString >> identifier2;
 		return ListMutuals(identifier, identifier2);
 	}
+	else if (command == "FindSeparation")
+	{
+		std::string identifier, identifier2;
+		inString >> identifier;
+		inString >> identifier2;
+		return FindSeperation(identifier, identifier2);
+	}
 
 	return false;
 }
@@ -88,6 +95,49 @@ User* Solution::GetUser(const std::string& identifier)
 	}
 	return nullptr;
 }
+bool Solution::FindSeperation(const std::string& identifier1, const std::string& identifier2) {
+	std::vector<User*> friends;
+	std::vector<std::string, std::string> visited;
+	int length = 0;
+	bool found = false;
+	bool inFriends = false;
+	visited.push_back(identifier1);
+	if (identifier1 == identifier2) {
+		_outFile << length << " degree(s)" << std::endl;
+		return true;
+	}
+	while (!found)
+	{
+		std::vector<User*> friendList = GetUser(visited.back())->GetFriends();
+		for (User* f : friendList) {
+			if (f->GetIdentifier() == identifier2) {
+				_outFile << length << " degree(s)" << std::endl;
+				return true;
+			}
+			else {
+				for (int i = 0; i < friends.size(); i++) {
+					if (friends[i]->GetIdentifier() == f->GetIdentifier()) {
+						inFriends = true;
+						break;
+					}
+				}
+				if (!inFriends) {
+					friends.push_back(f);
+				}
+				else {
+					inFriends = false;
+				}
+
+			}
+		}
+		length++;
+		visited.push_back(friends.back()->GetIdentifier());
+
+	}
+	_outFile << "6 degree(s)" << std::endl;
+	return true;
+
+}
 bool Solution::buildNetwork(const std::string& fileNameUsers, const std::string& fileNameFriendships) {
 	std::ifstream finUsers(fileNameUsers);
 	std::ifstream finFriendships(fileNameFriendships);
@@ -120,7 +170,7 @@ bool Solution::ListFriends(const std::string& identifier)
 {
 	_outFile << "ListFriends " << identifier << std::endl;
 	_outFile << GetUser(identifier)->GetFriends().size() << " friend(s) found." << std::endl;
-	for (User *friendptr : GetUser(identifier)->GetFriends())
+	for (User* friendptr : GetUser(identifier)->GetFriends())
 	{
 		_outFile << friendptr->GetName() << " [" << friendptr->GetIdentifier() << "]" << std::endl;
 	}
