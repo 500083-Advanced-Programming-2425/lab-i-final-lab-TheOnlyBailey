@@ -1,5 +1,6 @@
 #include <sstream>
 #include <iostream>
+
 #include "Solution.h"
 
 Solution::Solution() : _outFile("Output.txt") {
@@ -44,7 +45,39 @@ bool Solution::processCommand(const std::string& commandString) {
 		inString >> identifier2;
 		return FindSeperation(identifier, identifier2);
 	}
-
+	else if (command == "FriendScore")
+	{
+		std::string identifier, identifier2;
+		inString >> identifier;
+		inString >> identifier2;
+		return FindFriendScore(identifier, identifier2);
+	}
+	else if (command == "SuggestFriends")
+	{
+		std::string identifier;
+		inString >> identifier;
+		return SuggestFriends(identifier);
+	}
+	else if (command == "TotalUsers")
+	{
+		std::string identifier;
+		inString >> identifier;
+		if (identifier == "")
+		{
+			return TotalUsers();
+		}
+		else
+		{
+			std::vector<std::string> countries;
+			countries.push_back(identifier);
+			std::string country;
+			while (inString >> country)
+			{
+				countries.push_back(country);
+			}
+			return TotalUsers(countries);
+		}
+	}
 	return false;
 }
 bool Solution::ViewProfile(const std::string& identifier)
@@ -95,49 +128,111 @@ User* Solution::GetUser(const std::string& identifier)
 	}
 	return nullptr;
 }
-bool Solution::FindSeperation(const std::string& identifier1, const std::string& identifier2) {
-	std::vector<User*> friends;
-	std::vector<std::string, std::string> visited;
-	int length = 0;
-	bool found = false;
-	bool inFriends = false;
-	visited.push_back(identifier1);
-	if (identifier1 == identifier2) {
-		_outFile << length << " degree(s)" << std::endl;
-		return true;
-	}
-	while (!found)
+bool Solution::FindSeperation(const std::string& identifier1, const std::string& identifier2)
+{
+	_outFile << "FindSeparation " << identifier1 << " " << identifier2 << std::endl;
+	_outFile << GetUser(identifier1)->FindSeparaton(GetUser(identifier2)) << " degree(s)" << std::endl << std::endl;
+	return true;
+}
+
+bool Solution::FindFriendScore(const std::string& identifier1, const std::string& identifier2)
+{
+	User* user1 = GetUser(identifier1);
+	User* user2 = GetUser(identifier2);
+	double friendScore = user1->FindFriendScore(user2);
+	_outFile << "FriendScore " << identifier1 << " " << identifier2 << std::endl;
+	_outFile << std::to_string(friendScore).erase(std::to_string(friendScore).find_last_of('.') + 3) << std::endl << std::endl;
+	return true;
+}
+
+
+bool Solution::SuggestFriends(const std::string& identifier1)
+{
+	User* user1 = GetUser(identifier1);
+	double friendScores[5];
+	std::string* friendIdentifiers[5];
+	bool isFriend = false;
+	for (User& user2 : _users)
 	{
-		std::vector<User*> friendList = GetUser(visited.back())->GetFriends();
-		for (User* f : friendList) {
-			if (f->GetIdentifier() == identifier2) {
-				_outFile << length << " degree(s)" << std::endl;
-				return true;
+		if (user2.GetIdentifier() != user1->GetIdentifier())
+		{
+			for (User* friends : user1->GetFriends())
+			{
+				if (user2.GetIdentifier() == friends->GetIdentifier())
+				{
+					isFriend = true;
+					break;
+				}
 			}
-			else {
-				for (int i = 0; i < friends.size(); i++) {
-					if (friends[i]->GetIdentifier() == f->GetIdentifier()) {
-						inFriends = true;
+			if (!isFriend)
+			{
+				double friendScore = user1->FindFriendScore(&user2);
+				std::string* Identifier = &user2.GetIdentifier();
+				for (int i = 0; i < 5; ++i)
+				{
+					if (friendScore > friendScores[i])
+					{
+						for (int j = 4; j > i; --j)
+						{
+							friendScores[j] = friendScores[j - 1];
+							friendIdentifiers[j] = friendIdentifiers[j - 1];
+						}
+						friendScores[i] = friendScore;
+						friendIdentifiers[i] = Identifier;
 						break;
 					}
 				}
-				if (!inFriends) {
-					friends.push_back(f);
-				}
-				else {
-					inFriends = false;
-				}
 
 			}
+			isFriend = false;
 		}
-		length++;
-		visited.push_back(friends.back()->GetIdentifier());
-
 	}
-	_outFile << "6 degree(s)" << std::endl;
+	_outFile << "SuggestFriends " << identifier1 << std::endl;
+	for (int i = 0; i < 5; i++)
+	{
+		_outFile << GetUser(*friendIdentifiers[i])->GetName() << " [" << GetUser(*friendIdentifiers[i])->GetIdentifier() << "] - " << user1->FindNumMutuals(GetUser(*friendIdentifiers[i])) << " mutual friend(s)" << std::endl;
+	}
+	_outFile << std::endl;
 	return true;
-
 }
+
+bool Solution::TotalUsers()
+{
+	_outFile << "TotalUsers" << std::endl;
+	_outFile << _users.size() << std::endl << std::endl;
+	return true;
+}
+
+bool Solution::TotalUsers(const std::vector<std::string>& countries)
+{
+	int total = 0;
+	for (int i = 0; i < _users.size(); i++)
+	{
+		for (int j = 0; j < countries.size(); j++)
+		{
+			if (countries[j] == _users[i].GetCountry())
+			{
+				total++;
+			}
+		}
+	}
+	std::string countriesString;
+	for (int i = 0; i < countries.size(); i++)
+	{
+		if (i == countries.size() - 1)
+		{
+			countriesString += countries[i];
+		}
+		else
+		{
+			countriesString += countries[i] + " ";
+		}
+	}
+	_outFile << "TotalUsers " << countriesString << std::endl;
+	_outFile << total << std::endl << std::endl;
+	return true;
+}
+
 bool Solution::buildNetwork(const std::string& fileNameUsers, const std::string& fileNameFriendships) {
 	std::ifstream finUsers(fileNameUsers);
 	std::ifstream finFriendships(fileNameFriendships);

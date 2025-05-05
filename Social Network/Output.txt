@@ -24,30 +24,28 @@ Damien Long [B651431F]
 Bridget Miller [DFA5F822]
 Gloria Hernandez [E6EEE3D2]
 
-ListFriends 8A4ECF3A
-11 friend(s) found.
-Jessica Green [3603188A]
-Noelle Ortiz [3441EDC3]
-Xavier Ross [EC754FD3]
-Diana Henderson [64066FDC]
-Drew Cook [0E7E4EF0]
-Andrew Washington [B3E14885]
-Bridget Miller [DFA5F822]
-Brian Watson [43B06C7F]
-Yosef Hernandez [CE71C193]
-Whitney Garcia [D02598C4]
-Kent Reed [6A0E4C44]
-
 ListMutuals 73D0EF96 8A4ECF3A
 3 Mutual friend(s) found. 
 Andrew Washington [B3E14885]
 Brian Watson [43B06C7F]
 Bridget Miller [DFA5F822]
 
-ViewProfile A205E5BA
-Name: Naomi Young
-Age: 74
-Country: Netherlands
-Activity Rate: 18%
-Friends: 24
+FindSeparation 73D0EF96 A205E5BA
+3 degree(s)
+
+FriendScore 73D0EF96 A205E5BA
+240.00
+
+SuggestFriends 73D0EF96
+Amelia Green [B819BE27] - 7 mutual friend(s)
+Kent Reed [6A0E4C44] - 6 mutual friend(s)
+Natalie Rivera [65A5F18B] - 5 mutual friend(s)
+Wilson Thompson [8A4ECF3A] - 3 mutual friend(s)
+Mark Wright [04DE3DD6] - 3 mutual friend(s)
+
+TotalUsers GBR FRA
+246
+
+TotalUsers
+1000
 
