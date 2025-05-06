@@ -245,7 +245,7 @@ bool Solution::buildNetwork(const std::string& fileNameUsers, const std::string&
 			start = end + 1;
 			end = line.find(',', start);
 		}
-		_users.push_back(User(data[0], data[1], std::stoi(data[2]), data[3], std::stod(data[4])));
+		_users.push_back(User(data[0], data[1],  data[3], std::stoi(data[2]), std::stod(data[4])));
 	}
 	while (std::getline(finFriendships, line))
 	{
