@@ -16,7 +16,6 @@ public:
 	std::string GetUserData() const;
 	bool AddFriend(User* user);
 	const std::vector<User*>& GetFriends() const;
-	
 	const std::string& GetIdentifier() const;
 	const std::string& GetName() const;
 	const std::string& GetCountry() const;

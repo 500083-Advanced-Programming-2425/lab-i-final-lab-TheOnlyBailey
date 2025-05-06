@@ -1,6 +1,6 @@
 #include <sstream>
 #include <iostream>
-
+#include <array>
 #include "Solution.h"
 
 Solution::Solution() : _outFile("Output.txt") {
@@ -90,11 +90,11 @@ bool Solution::ViewProfile(const std::string& identifier)
 bool Solution::ListMutuals(const std::string& identifier1, const std::string& identifier2)
 {
 	_outFile << "ListMutuals " << identifier1 << " " << identifier2 << std::endl;
-	std::vector<User*> mutuals;
+	std::vector<const User*> mutuals;
 	int mutualCount = 0;
-	for (constexpr User* friendptr : GetUser(identifier1)->GetFriends())
+	for (const User* const friendptr : GetUser(identifier1)->GetFriends())
 	{
-		for (constexpr User* friendptr2 : GetUser(identifier2)->GetFriends())
+		for (const User* const friendptr2 : GetUser(identifier2)->GetFriends())
 		{
 			if (friendptr == friendptr2)
 			{
@@ -104,7 +104,7 @@ bool Solution::ListMutuals(const std::string& identifier1, const std::string& id
 		}
 	}
 	_outFile << mutualCount << " Mutual friend(s) found. " << std::endl;
-	for (constexpr User* friendptr : mutuals)
+	for (const User* const friendptr : mutuals)
 	{
 		_outFile << friendptr->GetName() << " [" << friendptr->GetIdentifier() << "]" << std::endl;
 	}
@@ -143,42 +143,14 @@ bool Solution::FindFriendScore(const std::string& identifier1, const std::string
 bool Solution::SuggestFriends(const std::string& identifier1)
 {
 	const User* const user1 = GetUser(identifier1);
-	double friendScores[5] = { 0,0,0,0,0 };
-	const std::string* friendIdentifiers[5];
-	bool isFriend = false;
+	std::array<double, 5> friendScores{};
+	std::vector<double> friendScores;
+	const std::array<const std::string*, 5> friendIdentifiers{};
 	for (const User& user2 : _users)
 	{
-		if (user2.GetIdentifier() != user1->GetIdentifier())
+	    if (&user2 != user1)
 		{
-			for (const User* const friends : user1->GetFriends())
-			{
-				if (user2.GetIdentifier() == friends->GetIdentifier())
-				{
-					isFriend = true;
-					break;
-				}
-			}
-			if (!isFriend)
-			{
-				const double friendScore = user1->FindFriendScore(&user2);
-				const std::string* const Identifier = &user2.GetIdentifier();
-				for (int i = 0; i < 5; ++i)
-				{
-					if (friendScore > friendScores[i])
-					{
-						for (int j = 4; j > i; --j)
-						{
-							friendScores[j] = friendScores[j - 1];
-							friendIdentifiers[j] = friendIdentifiers[j - 1];
-						}
-						friendScores[i] = friendScore;
-						friendIdentifiers[i] = Identifier;
-						break;
-					}
-				}
-
-			}
-			isFriend = false;
+				friendScores.push_back(user1->FindFriendScore(&user2));
 		}
 	}
 	_outFile << "SuggestFriends " << identifier1 << std::endl;
@@ -237,7 +209,7 @@ bool Solution::buildNetwork(const std::string& fileNameUsers, const std::string&
 	while (std::getline(finUsers, line))
 	{
 		int start = 0;
-		std::string data[5];
+		std::array<std::string, 5> data;
 		int end = line.find(',', 0);
 		for (int i = 0; i < 5; i++)
 		{
@@ -249,8 +221,10 @@ bool Solution::buildNetwork(const std::string& fileNameUsers, const std::string&
 	}
 	while (std::getline(finFriendships, line))
 	{
-		GetUser(line.substr(0, line.find(',')))->AddFriend(GetUser(line.substr(line.find(',') + 1, line.length())));
-		GetUser(line.substr(line.find(',') + 1, line.length()))->AddFriend(GetUser(line.substr(0, line.find(','))));
+		User* const user1 = GetUser(line.substr(0, line.find(',')));
+		User* const user2 = GetUser(line.substr(line.find(',') + 1, line.length()));
+		user1->AddFriend(user2);
+		user2->AddFriend(user1);
 	}
 	return true;
 }

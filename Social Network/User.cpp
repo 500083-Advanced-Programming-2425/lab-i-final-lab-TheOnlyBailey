@@ -2,17 +2,20 @@
 #include <queue>
 #include <unordered_map>
 #include <unordered_set>
-#include "Solution.h"
+
 User::User() : _identifier(), _name(), _country(), _age(0), _rateOfActivity(0.0) {}
 User::User(const std::string& identifier,const std::string& name, const std::string& country, int age, double rateOfActivity) : _identifier(identifier), _name(name), _country(country), _age(age), _rateOfActivity(rateOfActivity) {}
 
-const std::string& User::GetIdentifier() const{ return _identifier; }
+const std::string& User::GetIdentifier() const { return _identifier; }
+
 const std::string& User::GetName() const{ return _name; }
+
 bool User::AddFriend(User* user)
 {
 	_friends.push_back(user);
 	return true;
 }
+
 const std::vector<User*>& User::GetFriends() const { return _friends; }
 
 const int User::FindNumMutuals(const User* User2) const
@@ -46,7 +49,6 @@ const int User::FindSeparaton(const User* identifier2) const
 
 	int maxDegree = 0;
 	const User*const  _startNode = this;
-	const User* const _endNode = identifier2;
 
 	queue.push(_startNode);
 	visited.insert(_startNode);
@@ -95,9 +97,11 @@ const double User::FindFriendScore(const User* user2) const
 	const int mutuals = this->FindNumMutuals(user2);
 	const int separation = this->FindSeparaton(user2);
 	const float score = (mutuals * this->GetRateOfActivity() * user2->GetRateOfActivity()) + (720 / std::min(separation, 6));
-	return (this->FindNumMutuals(user2) * this->GetRateOfActivity() * user2->GetRateOfActivity()) + (720 / std::min(this->FindSeparaton(user2), 6));
+	return score;
 }
+
 const std::string& User::GetCountry() const{ return _country; }
+
 std::string User::GetUserData() const
 {
 	std::string _outFile;
