@@ -17,6 +17,7 @@ public:
 	bool AddFriend(User* user);
 	const std::vector<User*>& GetFriends() const;
 	const std::string& GetIdentifier() const;
+	const bool IsFriend(const User& user) const;
 	const std::string& GetName() const;
 	const std::string& GetCountry() const;
 	const double GetRateOfActivity() const;

@@ -2,6 +2,7 @@
 #include <queue>
 #include <unordered_map>
 #include <unordered_set>
+#include <algorithm>
 
 User::User() : _identifier(), _name(), _country(), _age(0), _rateOfActivity(0.0) {}
 User::User(const std::string& identifier,const std::string& name, const std::string& country, int age, double rateOfActivity) : _identifier(identifier), _name(name), _country(country), _age(age), _rateOfActivity(rateOfActivity) {}
@@ -47,7 +48,6 @@ const int User::FindSeparaton(const User* identifier2) const
 	std::unordered_map<const User*,const User*> from;
 	std::unordered_set<const User*> visited;
 
-	int maxDegree = 0;
 	const User*const  _startNode = this;
 
 	queue.push(_startNode);
@@ -59,7 +59,7 @@ const int User::FindSeparaton(const User* identifier2) const
 		const User* const current = queue.front();
 		queue.pop();
 
-		if (current->GetIdentifier() == identifier2->GetIdentifier())
+		if (current == identifier2)
 		{
 			int separations = 0;
 			for (const User* node = current; node != nullptr; node = from[node])
@@ -86,7 +86,6 @@ const int User::FindSeparaton(const User* identifier2) const
 				from[friendUser] = current;
 			}
 		}
-		maxDegree++;
 	}
 	return 6;
 
@@ -98,6 +97,20 @@ const double User::FindFriendScore(const User* user2) const
 	const int separation = this->FindSeparaton(user2);
 	const float score = (mutuals * this->GetRateOfActivity() * user2->GetRateOfActivity()) + (720 / std::min(separation, 6));
 	return score;
+}
+
+const bool User::IsFriend(const User& user) const
+{
+
+	for (User* const friendpntr : this->GetFriends())
+	{
+		if (friendpntr == &user)
+		{
+			return true;
+		}
+	}
+	return false;
+	
 }
 
 const std::string& User::GetCountry() const{ return _country; }

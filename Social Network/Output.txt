@@ -36,3 +36,13 @@ FindSeparation 73D0EF96 A205E5BA
 FriendScore 73D0EF96 A205E5BA
 240.00
 
+SuggestFriends 73D0EF96
+Amelia Green [B819BE27] - 7 mutual friend(s)
+Kent Reed [6A0E4C44] - 6 mutual friend(s)
+Natalie Rivera [65A5F18B] - 5 mutual friend(s)
+Wilson Thompson [8A4ECF3A] - 3 mutual friend(s)
+Mark Wright [04DE3DD6] - 3 mutual friend(s)
+
+TotalUsers GBR FRA
+246
+

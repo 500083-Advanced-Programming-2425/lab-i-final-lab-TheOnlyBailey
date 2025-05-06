@@ -150,7 +150,7 @@ bool Solution::SuggestFriends(const std::string& identifier1)
 	std::vector<std::pair<const User*, double>> scores;
 	for (const User& user2 : _users)
 	{
-		if (&user2 != user1 )
+		if (&user2 != user1 && !user1->IsFriend(user2))
 		{
 			scores.emplace_back( &user2 ,user1->FindFriendScore(&user2) );
 		}
@@ -164,7 +164,7 @@ bool Solution::SuggestFriends(const std::string& identifier1)
 
 	_outFile << "SuggestFriends " << identifier1 << std::endl;
 
-	for (int i = scores.size()-1; i > scores.size() - 5; i--)
+	for (int i = scores.size()-1; i > scores.size() - 6; i--)
 	{
 		_outFile << scores[i].first->GetName() << " [" << scores[i].first->GetIdentifier() << "] - " << user1->FindNumMutuals(scores[i].first) << " mutual friend(s)" << std::endl;
 	}
