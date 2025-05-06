@@ -2,13 +2,17 @@
 #include <iostream>
 #include <array>
 #include "Solution.h"
+#include <unordered_map>
+#include <algorithm>
 
-Solution::Solution() : _outFile("Output.txt") {
+Solution::Solution() : _outFile("Output.txt")
+{
 	// Add your code here
 }
 Solution::~Solution() = default;
 
-bool Solution::processCommand(const std::string& commandString) {
+bool Solution::processCommand(const std::string& commandString)
+{
 	std::istringstream inString(commandString);
 	std::string command;
 	inString >> command;
@@ -143,20 +147,26 @@ bool Solution::FindFriendScore(const std::string& identifier1, const std::string
 bool Solution::SuggestFriends(const std::string& identifier1)
 {
 	const User* const user1 = GetUser(identifier1);
-	std::array<double, 5> friendScores{};
-	std::vector<double> friendScores;
-	const std::array<const std::string*, 5> friendIdentifiers{};
+	std::vector<std::pair<const User*, double>> scores;
 	for (const User& user2 : _users)
 	{
-	    if (&user2 != user1)
+		if (&user2 != user1 )
 		{
-				friendScores.push_back(user1->FindFriendScore(&user2));
+			scores.emplace_back( &user2 ,user1->FindFriendScore(&user2) );
 		}
+		
 	}
+	std::sort(scores.begin(), scores.end(),
+		[](const auto& a, const auto& b)
+		{
+			return a.second < b.second;
+		});
+
 	_outFile << "SuggestFriends " << identifier1 << std::endl;
-	for (int i = 0; i < 5; i++)
+
+	for (int i = scores.size()-1; i > scores.size() - 5; i--)
 	{
-		_outFile << GetUser(*friendIdentifiers[i])->GetName() << " [" << GetUser(*friendIdentifiers[i])->GetIdentifier() << "] - " << user1->FindNumMutuals(GetUser(*friendIdentifiers[i])) << " mutual friend(s)" << std::endl;
+		_outFile << scores[i].first->GetName() << " [" << scores[i].first->GetIdentifier() << "] - " << user1->FindNumMutuals(scores[i].first) << " mutual friend(s)" << std::endl;
 	}
 	_outFile << std::endl;
 	return true;
@@ -199,10 +209,12 @@ bool Solution::TotalUsers(const std::vector<std::string>& countries)
 	return true;
 }
 
-bool Solution::buildNetwork(const std::string& fileNameUsers, const std::string& fileNameFriendships) {
+bool Solution::buildNetwork(const std::string& fileNameUsers, const std::string& fileNameFriendships)
+{
 	std::ifstream finUsers(fileNameUsers);
 	std::ifstream finFriendships(fileNameFriendships);
-	if (finUsers.fail() || finFriendships.fail()) {
+	if (finUsers.fail() || finFriendships.fail())
+	{
 		return false;
 	}
 	std::string line;
@@ -217,7 +229,7 @@ bool Solution::buildNetwork(const std::string& fileNameUsers, const std::string&
 			start = end + 1;
 			end = line.find(',', start);
 		}
-		_users.push_back(User(data[0], data[1],  data[3], std::stoi(data[2]), std::stod(data[4])));
+		_users.push_back(User(data[0], data[1], data[3], std::stoi(data[2]), std::stod(data[4])));
 	}
 	while (std::getline(finFriendships, line))
 	{

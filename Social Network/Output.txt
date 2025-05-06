@@ -36,6 +36,3 @@ FindSeparation 73D0EF96 A205E5BA
 FriendScore 73D0EF96 A205E5BA
 240.00
 
-TotalUsers GBR FRA
-246
-
