@@ -6,13 +6,7 @@
 Solution::Solution() : _outFile("Output.txt") {
 	// Add your code here
 }
-Solution::~Solution()
-{
-	if (_outFile.is_open())
-	{
-		_outFile.close();
-	}
-}
+Solution::~Solution() = default;
 
 bool Solution::processCommand(const std::string& commandString) {
 	std::istringstream inString(commandString);
@@ -98,11 +92,11 @@ bool Solution::ListMutuals(const std::string& identifier1, const std::string& id
 	_outFile << "ListMutuals " << identifier1 << " " << identifier2 << std::endl;
 	std::vector<User*> mutuals;
 	int mutualCount = 0;
-	for (User* friendptr : GetUser(identifier1)->GetFriends())
+	for (constexpr User* friendptr : GetUser(identifier1)->GetFriends())
 	{
-		for (User* friendptr2 : GetUser(identifier2)->GetFriends())
+		for (constexpr User* friendptr2 : GetUser(identifier2)->GetFriends())
 		{
-			if (friendptr->GetIdentifier() == friendptr2->GetIdentifier())
+			if (friendptr == friendptr2)
 			{
 				mutuals.push_back(friendptr);
 				mutualCount++;
@@ -110,14 +104,14 @@ bool Solution::ListMutuals(const std::string& identifier1, const std::string& id
 		}
 	}
 	_outFile << mutualCount << " Mutual friend(s) found. " << std::endl;
-	for (User* friendptr : mutuals)
+	for (constexpr User* friendptr : mutuals)
 	{
 		_outFile << friendptr->GetName() << " [" << friendptr->GetIdentifier() << "]" << std::endl;
 	}
 	_outFile << std::endl;
 	return true;
 }
-User* Solution::GetUser(const std::string& identifier)
+const User* Solution::GetUser(const std::string& identifier)
 {
 	for (int i = 0; i < _users.size(); i++)
 	{
@@ -137,9 +131,9 @@ bool Solution::FindSeperation(const std::string& identifier1, const std::string&
 
 bool Solution::FindFriendScore(const std::string& identifier1, const std::string& identifier2)
 {
-	User* user1 = GetUser(identifier1);
-	User* user2 = GetUser(identifier2);
-	double friendScore = user1->FindFriendScore(user2);
+	const User* const user1 = GetUser(identifier1);
+	const User* const user2 = GetUser(identifier2);
+	const double friendScore = user1->FindFriendScore(user2);
 	_outFile << "FriendScore " << identifier1 << " " << identifier2 << std::endl;
 	_outFile << std::to_string(friendScore).erase(std::to_string(friendScore).find_last_of('.') + 3) << std::endl << std::endl;
 	return true;
@@ -148,7 +142,7 @@ bool Solution::FindFriendScore(const std::string& identifier1, const std::string
 
 bool Solution::SuggestFriends(const std::string& identifier1)
 {
-	User* user1 = GetUser(identifier1);
+	const User* user1 = GetUser(identifier1);
 	double friendScores[5];
 	std::string* friendIdentifiers[5];
 	bool isFriend = false;

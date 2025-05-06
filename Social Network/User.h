@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-class User
+class User final
 {
 
 	// Add your code here
@@ -12,28 +12,29 @@ class User
 
 public:
 	User();
-	User(std::string identifier, std::string name, int age, std::string country, double rateOfActivity);
+	User(const std::string& identifier, const std::string& name, int age, const std::string& country, double rateOfActivity);
 	std::string GetUserData() const;
 	bool AddFriend(User* user);
-	std::vector<User*>& GetFriends();
+	const std::vector<User*>& GetFriends();
 	
 	std::string& GetIdentifier();
 	std::string& GetName();
 	std::string& GetCountry();
 	double GetRateOfActivity();
 
-	double FindFriendScore(User* user2);
-	int FindNumMutuals(User* User2);
-	int FindSeparaton(User* identifier2);
+	double FindFriendScore(const User* user2) const;
+	const int FindNumMutuals(const User* User2);
+	const int FindSeparaton(const User* identifier2);
 
 private:
+	std::vector<User*> _friends;
 	std::string _identifier = "";
 	std::string _name;
-	int _age;
 	std::string _country;
+	int _age;
 	float _rateOfActivity;
 
-	std::vector<User*> _friends;
+
 	
 	// Add your code here
 };

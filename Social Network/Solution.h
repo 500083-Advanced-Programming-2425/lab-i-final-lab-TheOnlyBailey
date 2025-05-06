@@ -26,7 +26,7 @@ public:
 	bool SuggestFriends(const std::string& identifier1);
 	bool TotalUsers();
 	bool TotalUsers(const std::vector<std::string>& countries);
-	User* GetUser(const std::string& identifier);
+	const User* GetUser(const std::string& identifier);
 
 
 private:

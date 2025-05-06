@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include "Solution.h"
 User::User() : _identifier(), _name(), _age(0), _country(), _rateOfActivity(0.0) {}
-User::User(std::string identifier, std::string name, int age, std::string country, double rateOfActivity) : _identifier(identifier), _name(name), _age(age), _country(country), _rateOfActivity(rateOfActivity) {}
+User::User(const std::string& identifier,const std::string& name, int age,const std::string& country, double rateOfActivity) : _identifier(identifier), _name(name), _age(age), _country(country), _rateOfActivity(rateOfActivity) {}
 
 std::string& User::GetIdentifier() { return _identifier; }
 std::string& User::GetName() { return _name; }
@@ -13,9 +13,9 @@ bool User::AddFriend(User* user)
 	_friends.push_back(user);
 	return true;
 }
-std::vector<User*>& User::GetFriends() { return _friends; }
+const std::vector<User*>& User::GetFriends() { return _friends; }
 
-int User::FindNumMutuals(User* User2)
+const int User::FindNumMutuals(const User* User2)
 {
 	int mutualCount = 0;
 	for (User* friendptr : this->GetFriends())
@@ -38,7 +38,7 @@ double User::GetRateOfActivity()
 }
 
 
-int User::FindSeparaton(User* identifier2)
+const int User::FindSeparaton(const User* identifier2)
 {
 	std::queue<User*> queue;
 	std::unordered_map<User*, User*> from;
@@ -90,7 +90,7 @@ int User::FindSeparaton(User* identifier2)
 
 }
 
-double User::FindFriendScore(User* user2)
+double User::FindFriendScore(const User* user2) const
 {
 	int mutuals = this->FindNumMutuals(user2);
 	int separation = this->FindSeparaton(user2);
