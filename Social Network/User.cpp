@@ -19,19 +19,19 @@ bool User::AddFriend(User* user)
 
 const std::vector<User*>& User::GetFriends() const { return _friends; }
 
-const int User::FindNumMutuals(const User* User2) const
+const int User::FindNumMutuals(const User* user2) const
 {
+	std::unordered_set<const User*> friendsOfThis(this->_friends.begin(), this->_friends.end());
+
 	int mutualCount = 0;
-	for (const User* const friendptr : this->GetFriends())
+	for (const User* friendPtr : user2->GetFriends())
 	{
-		for (const User* const friendptr2 : User2->GetFriends())
+		if (friendsOfThis.count(friendPtr))
 		{
-			if (friendptr == friendptr2)
-			{
-				mutualCount++;
-			}
+			++mutualCount;
 		}
 	}
+
 	return mutualCount;
 }
 
@@ -42,60 +42,68 @@ const double User::GetRateOfActivity() const
 }
 
 
-const int User::FindSeparaton(const User* identifier2) const
+const int User::FindSeparation(const User* user2) const
 {
+	auto key = std::minmax(this, user2);
+	auto& cache = _separationCache;
+
+	if (cache.find(key) != cache.end())
+		return cache[key];
+
 	std::queue<const User*> queue;
-	std::unordered_map<const User*,const User*> from;
-	std::unordered_set<const User*> visited;
+	std::unordered_map<const User*, int> visited;
 
-	const User*const  _startNode = this;
+	queue.push(this);
+	visited[this] = 0;
 
-	queue.push(_startNode);
-	visited.insert(_startNode);
-	from[_startNode] = nullptr;
 
 	while (!queue.empty())
 	{
-		const User* const current = queue.front();
+		const User* current = queue.front();
 		queue.pop();
 
-		if (current == identifier2)
-		{
-			int separations = 0;
-			for (const User* node = current; node != nullptr; node = from[node])
-			{
-				separations++;
-			}
-			separations--;
-			if (separations > 6)
-			{
-				return 6;
-			}
-			else
-			{
-				return separations;
-			}
-		}
+		int depth = visited[current];
+		if (depth >= 6) break;
 
-		for (User* const friendUser : current->GetFriends())
+		for (const User* friendUser : current->GetFriends())
 		{
 			if (visited.find(friendUser) == visited.end())
 			{
+				if (friendUser == user2)
+				{
+					cache.emplace(key, depth + 1);
+					return depth + 1;
+				}
+				visited[friendUser] = depth + 1;
 				queue.push(friendUser);
-				visited.insert(friendUser);
-				from[friendUser] = current;
 			}
 		}
 	}
-	return 6;
 
+	cache[key] = 6;
+	return 6;
 }
+
+
+
+
 
 const double User::FindFriendScore(const User* user2) const
 {
-	const int mutuals = this->FindNumMutuals(user2);
-	const int separation = this->FindSeparaton(user2);
-	const float score = (mutuals * this->GetRateOfActivity() * user2->GetRateOfActivity()) + (720 / std::min(separation, 6));
+	auto key = std::minmax(this, user2);
+	auto& cache = _friendScoreCache;
+
+	if (cache.find(key) != cache.end())
+		return cache[key];
+
+	int mutuals = this->FindNumMutuals(user2);
+	int separation = this->FindSeparation(user2);
+	int clampedSep = std::max(1, std::min(separation, 6));
+
+	double activityProduct = this->GetRateOfActivity() * user2->GetRateOfActivity();
+	double score = (mutuals * activityProduct) + (720.0 / clampedSep);
+
+	cache[key] = score;
 	return score;
 }
 

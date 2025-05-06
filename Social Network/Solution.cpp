@@ -11,6 +11,18 @@ Solution::Solution() : _outFile("Output.txt")
 }
 Solution::~Solution() = default;
 
+struct UserPairHash
+{
+	template <typename T1, typename T2>
+	std::size_t operator ()(const std::pair<T1, T2>& p) const
+	{
+		auto h1 = std::hash<T1>{}(p.first);
+		auto h2 = std::hash<T2>{}(p.second);
+		return h1 ^ (h2 << 1);  // Combine the hashes
+	}
+};
+
+
 bool Solution::processCommand(const std::string& commandString)
 {
 	std::istringstream inString(commandString);
@@ -129,7 +141,7 @@ User* Solution::GetUser(const std::string& identifier)
 bool Solution::FindSeperation(const std::string& identifier1, const std::string& identifier2)
 {
 	_outFile << "FindSeparation " << identifier1 << " " << identifier2 << std::endl;
-	_outFile << GetUser(identifier1)->FindSeparaton(GetUser(identifier2)) << " degree(s)" << std::endl << std::endl;
+	_outFile << GetUser(identifier1)->FindSeparation(GetUser(identifier2)) << " degree(s)" << std::endl << std::endl;
 	return true;
 }
 
@@ -143,34 +155,63 @@ bool Solution::FindFriendScore(const std::string& identifier1, const std::string
 	return true;
 }
 
-
 bool Solution::SuggestFriends(const std::string& identifier1)
 {
 	const User* const user1 = GetUser(identifier1);
+
+	// Cache for storing computed friend scores
+	static std::unordered_map<std::pair<const User*, const User*>, double, UserPairHash> scoreCache;
+
 	std::vector<std::pair<const User*, double>> scores;
+
+	// Step 1: Calculate friend scores and store them (with memoization)
 	for (const User& user2 : _users)
 	{
 		if (&user2 != user1 && !user1->IsFriend(user2))
 		{
-			scores.emplace_back( &user2 ,user1->FindFriendScore(&user2) );
+			// Check if the score is already cached
+			auto key = std::make_pair(user1, &user2);
+
+			// If cached, use it, otherwise calculate and cache it
+			double score;
+			auto it = scoreCache.find(key);
+			if (it != scoreCache.end())
+			{
+				// If score is cached, use it
+				score = it->second;
+			}
+			else
+			{
+				// Calculate the score and cache it
+				score = user1->FindFriendScore(&user2);
+				scoreCache[key] = score;
+			}
+
+			// Add to the scores vector
+			scores.emplace_back(&user2, score);
 		}
-		
 	}
-	std::sort(scores.begin(), scores.end(),
+
+	// Step 2: Use partial_sort to sort only the top 5 friend suggestions
+	std::partial_sort(scores.begin(), scores.begin() + 5, scores.end(),
 		[](const auto& a, const auto& b)
 		{
-			return a.second < b.second;
+			return a.second > b.second;  // Sort in descending order by score
 		});
 
+	// Step 3: Output the top 5 suggestions
 	_outFile << "SuggestFriends " << identifier1 << std::endl;
-
-	for (int i = scores.size()-1; i > scores.size() - 6; i--)
+	for (int i = 0; i < 5 && i < scores.size(); i++)
 	{
-		_outFile << scores[i].first->GetName() << " [" << scores[i].first->GetIdentifier() << "] - " << user1->FindNumMutuals(scores[i].first) << " mutual friend(s)" << std::endl;
+		const User* suggestedUser = scores[i].first;
+		_outFile << suggestedUser->GetName() << " [" << suggestedUser->GetIdentifier() << "] - "
+			<< user1->FindNumMutuals(suggestedUser) << " mutual friend(s)" << std::endl;
 	}
 	_outFile << std::endl;
 	return true;
 }
+
+
 
 bool Solution::TotalUsers()
 {
