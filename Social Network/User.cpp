@@ -3,26 +3,26 @@
 #include <unordered_map>
 #include <unordered_set>
 #include "Solution.h"
-User::User() : _identifier(), _name(), _age(0), _country(), _rateOfActivity(0.0) {}
-User::User(const std::string& identifier,const std::string& name, int age,const std::string& country, double rateOfActivity) : _identifier(identifier), _name(name), _age(age), _country(country), _rateOfActivity(rateOfActivity) {}
+User::User() : _identifier(), _name(), _country(), _age(0), _rateOfActivity(0.0) {}
+User::User(const std::string& identifier,const std::string& name, const std::string& country, int age, double rateOfActivity) : _identifier(identifier), _name(name), _country(country), _age(age), _rateOfActivity(rateOfActivity) {}
 
-std::string& User::GetIdentifier() { return _identifier; }
-std::string& User::GetName() { return _name; }
+const std::string& User::GetIdentifier() const{ return _identifier; }
+const std::string& User::GetName() const{ return _name; }
 bool User::AddFriend(User* user)
 {
 	_friends.push_back(user);
 	return true;
 }
-const std::vector<User*>& User::GetFriends() { return _friends; }
+const std::vector<User*>& User::GetFriends() const { return _friends; }
 
-const int User::FindNumMutuals(const User* User2)
+const int User::FindNumMutuals(const User* User2) const
 {
 	int mutualCount = 0;
-	for (User* friendptr : this->GetFriends())
+	for (const User* const friendptr : this->GetFriends())
 	{
-		for (User* friendptr2 : User2->GetFriends())
+		for (const User* const friendptr2 : User2->GetFriends())
 		{
-			if (friendptr->GetIdentifier() == friendptr2->GetIdentifier())
+			if (friendptr == friendptr2)
 			{
 				mutualCount++;
 			}
@@ -32,21 +32,21 @@ const int User::FindNumMutuals(const User* User2)
 }
 
 
-double User::GetRateOfActivity()
+const double User::GetRateOfActivity() const
 {
 	return _rateOfActivity;
 }
 
 
-const int User::FindSeparaton(const User* identifier2)
+const int User::FindSeparaton(const User* identifier2) const
 {
-	std::queue<User*> queue;
-	std::unordered_map<User*, User*> from;
-	std::unordered_set<User*> visited;
+	std::queue<const User*> queue;
+	std::unordered_map<const User*,const User*> from;
+	std::unordered_set<const User*> visited;
 
 	int maxDegree = 0;
-	User* _startNode = this;
-	User* _endNode = identifier2;
+	const User*const  _startNode = this;
+	const User* const _endNode = identifier2;
 
 	queue.push(_startNode);
 	visited.insert(_startNode);
@@ -54,13 +54,13 @@ const int User::FindSeparaton(const User* identifier2)
 
 	while (!queue.empty())
 	{
-		User* current = queue.front();
+		const User* const current = queue.front();
 		queue.pop();
 
 		if (current->GetIdentifier() == identifier2->GetIdentifier())
 		{
 			int separations = 0;
-			for (User* node = current; node != nullptr; node = from[node])
+			for (const User* node = current; node != nullptr; node = from[node])
 			{
 				separations++;
 			}
@@ -75,7 +75,7 @@ const int User::FindSeparaton(const User* identifier2)
 			}
 		}
 
-		for (User* friendUser : current->GetFriends())
+		for (User* const friendUser : current->GetFriends())
 		{
 			if (visited.find(friendUser) == visited.end())
 			{
@@ -90,14 +90,14 @@ const int User::FindSeparaton(const User* identifier2)
 
 }
 
-double User::FindFriendScore(const User* user2) const
+const double User::FindFriendScore(const User* user2) const
 {
-	int mutuals = this->FindNumMutuals(user2);
-	int separation = this->FindSeparaton(user2);
-	float score = (mutuals * this->GetRateOfActivity() * user2->GetRateOfActivity()) + (720 / std::min(separation, 6));
+	const int mutuals = this->FindNumMutuals(user2);
+	const int separation = this->FindSeparaton(user2);
+	const float score = (mutuals * this->GetRateOfActivity() * user2->GetRateOfActivity()) + (720 / std::min(separation, 6));
 	return (this->FindNumMutuals(user2) * this->GetRateOfActivity() * user2->GetRateOfActivity()) + (720 / std::min(this->FindSeparaton(user2), 6));
 }
-std::string& User::GetCountry() { return _country; }
+const std::string& User::GetCountry() const{ return _country; }
 std::string User::GetUserData() const
 {
 	std::string _outFile;

@@ -12,19 +12,18 @@ class User final
 
 public:
 	User();
-	User(const std::string& identifier, const std::string& name, int age, const std::string& country, double rateOfActivity);
+	User(const std::string& identifier, const std::string& name, const std::string& country, int age, double rateOfActivity);
 	std::string GetUserData() const;
 	bool AddFriend(User* user);
-	const std::vector<User*>& GetFriends();
+	const std::vector<User*>& GetFriends() const;
 	
-	std::string& GetIdentifier();
-	std::string& GetName();
-	std::string& GetCountry();
-	double GetRateOfActivity();
-
-	double FindFriendScore(const User* user2) const;
-	const int FindNumMutuals(const User* User2);
-	const int FindSeparaton(const User* identifier2);
+	const std::string& GetIdentifier() const;
+	const std::string& GetName() const;
+	const std::string& GetCountry() const;
+	const double GetRateOfActivity() const;
+	const double FindFriendScore(const User* user2) const;
+	const int FindNumMutuals(const User* User2) const;
+	const int FindSeparaton(const User* identifier2) const;
 
 private:
 	std::vector<User*> _friends;

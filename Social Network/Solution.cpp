@@ -111,7 +111,7 @@ bool Solution::ListMutuals(const std::string& identifier1, const std::string& id
 	_outFile << std::endl;
 	return true;
 }
-const User* Solution::GetUser(const std::string& identifier)
+User* Solution::GetUser(const std::string& identifier)
 {
 	for (int i = 0; i < _users.size(); i++)
 	{
@@ -142,15 +142,15 @@ bool Solution::FindFriendScore(const std::string& identifier1, const std::string
 
 bool Solution::SuggestFriends(const std::string& identifier1)
 {
-	const User* user1 = GetUser(identifier1);
-	double friendScores[5];
-	std::string* friendIdentifiers[5];
+	const User* const user1 = GetUser(identifier1);
+	double friendScores[5] = { 0,0,0,0,0 };
+	const std::string* friendIdentifiers[5];
 	bool isFriend = false;
-	for (User& user2 : _users)
+	for (const User& user2 : _users)
 	{
 		if (user2.GetIdentifier() != user1->GetIdentifier())
 		{
-			for (User* friends : user1->GetFriends())
+			for (const User* const friends : user1->GetFriends())
 			{
 				if (user2.GetIdentifier() == friends->GetIdentifier())
 				{
@@ -160,8 +160,8 @@ bool Solution::SuggestFriends(const std::string& identifier1)
 			}
 			if (!isFriend)
 			{
-				double friendScore = user1->FindFriendScore(&user2);
-				std::string* Identifier = &user2.GetIdentifier();
+				const double friendScore = user1->FindFriendScore(&user2);
+				const std::string* const Identifier = &user2.GetIdentifier();
 				for (int i = 0; i < 5; ++i)
 				{
 					if (friendScore > friendScores[i])
@@ -259,7 +259,7 @@ bool Solution::ListFriends(const std::string& identifier)
 {
 	_outFile << "ListFriends " << identifier << std::endl;
 	_outFile << GetUser(identifier)->GetFriends().size() << " friend(s) found." << std::endl;
-	for (User* friendptr : GetUser(identifier)->GetFriends())
+	for (const User* const friendptr : GetUser(identifier)->GetFriends())
 	{
 		_outFile << friendptr->GetName() << " [" << friendptr->GetIdentifier() << "]" << std::endl;
 	}
