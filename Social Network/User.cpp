@@ -5,11 +5,11 @@
 #include <algorithm>
 
 User::User() : _identifier(), _name(), _country(), _age(0), _rateOfActivity(0.0) {}
-User::User(const std::string& identifier,const std::string& name, const std::string& country, int age, double rateOfActivity) : _identifier(identifier), _name(name), _country(country), _age(age), _rateOfActivity(rateOfActivity) {}
+User::User(const std::string& identifier, const std::string& name, const std::string& country, int age, double rateOfActivity) : _identifier(identifier), _name(name), _country(country), _age(age), _rateOfActivity(rateOfActivity) {}
 
 const std::string& User::GetIdentifier() const { return _identifier; }
 
-const std::string& User::GetName() const{ return _name; }
+const std::string& User::GetName() const { return _name; }
 
 bool User::AddFriend(User* user)
 {
@@ -21,10 +21,10 @@ const std::vector<User*>& User::GetFriends() const { return _friends; }
 
 const int User::FindNumMutuals(const User* user2) const
 {
-	std::unordered_set<const User*> friendsOfThis(this->_friends.begin(), this->_friends.end());
+	std::unordered_set<const User*> const friendsOfThis(this->_friends.begin(), this->_friends.end());
 
 	int mutualCount = 0;
-	for (const User* friendPtr : user2->GetFriends())
+	for (const User* const friendPtr : user2->GetFriends())
 	{
 		if (friendsOfThis.count(friendPtr))
 		{
@@ -59,13 +59,13 @@ const int User::FindSeparation(const User* user2) const
 
 	while (!queue.empty())
 	{
-		const User* current = queue.front();
+		const User* const current = queue.front();
 		queue.pop();
 
 		int depth = visited[current];
 		if (depth >= 6) break;
 
-		for (const User* friendUser : current->GetFriends())
+		for (const User* const friendUser : current->GetFriends())
 		{
 			if (visited.find(friendUser) == visited.end())
 			{
@@ -90,18 +90,18 @@ const int User::FindSeparation(const User* user2) const
 
 const double User::FindFriendScore(const User* user2) const
 {
-	auto key = std::minmax(this, user2);
+	const auto key = std::minmax(this, user2);
 	auto& cache = _friendScoreCache;
 
 	if (cache.find(key) != cache.end())
 		return cache[key];
 
-	int mutuals = this->FindNumMutuals(user2);
-	int separation = this->FindSeparation(user2);
-	int clampedSep = std::max(1, std::min(separation, 6));
+	const int mutuals = this->FindNumMutuals(user2);
+	const int separation = this->FindSeparation(user2);
+	const int clampedSep = std::max(1, std::min(separation, 6));
 
-	double activityProduct = this->GetRateOfActivity() * user2->GetRateOfActivity();
-	double score = (mutuals * activityProduct) + (720.0 / clampedSep);
+	const double activityProduct = this->GetRateOfActivity() * user2->GetRateOfActivity();
+	const double score = (mutuals * activityProduct) + (720.0 / clampedSep);
 
 	cache[key] = score;
 	return score;
@@ -118,10 +118,10 @@ const bool User::IsFriend(const User& user) const
 		}
 	}
 	return false;
-	
+
 }
 
-const std::string& User::GetCountry() const{ return _country; }
+const std::string& User::GetCountry() const { return _country; }
 
 std::string User::GetUserData() const
 {

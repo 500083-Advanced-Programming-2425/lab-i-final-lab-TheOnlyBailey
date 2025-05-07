@@ -7,20 +7,9 @@
 
 Solution::Solution() : _outFile("Output.txt")
 {
-	// Add your code here
 }
 Solution::~Solution() = default;
 
-struct UserPairHash
-{
-	template <typename T1, typename T2>
-	std::size_t operator ()(const std::pair<T1, T2>& p) const
-	{
-		auto h1 = std::hash<T1>{}(p.first);
-		auto h2 = std::hash<T2>{}(p.second);
-		return h1 ^ (h2 << 1);  // Combine the hashes
-	}
-};
 
 
 bool Solution::processCommand(const std::string& commandString)
@@ -92,15 +81,7 @@ bool Solution::processCommand(const std::string& commandString)
 }
 bool Solution::ViewProfile(const std::string& identifier)
 {
-	if (_outFile.is_open())
-	{
-		_outFile << GetUser(identifier)->GetUserData() << std::endl;
-	}
-	else
-	{
-		return false;
-	}
-
+	_outFile << GetUser(identifier)->GetUserData() << std::endl;
 	return true;
 }
 bool Solution::ListMutuals(const std::string& identifier1, const std::string& identifier2)
@@ -159,53 +140,23 @@ bool Solution::SuggestFriends(const std::string& identifier1)
 {
 	const User* const user1 = GetUser(identifier1);
 
-	// Cache for storing computed friend scores
-	static std::unordered_map<std::pair<const User*, const User*>, double, UserPairHash> scoreCache;
-
 	std::vector<std::pair<const User*, double>> scores;
 
-	// Step 1: Calculate friend scores and store them (with memoization)
 	for (const User& user2 : _users)
 	{
 		if (&user2 != user1 && !user1->IsFriend(user2))
 		{
-			// Check if the score is already cached
-			auto key = std::make_pair(user1, &user2);
-
-			// If cached, use it, otherwise calculate and cache it
-			double score;
-			auto it = scoreCache.find(key);
-			if (it != scoreCache.end())
-			{
-				// If score is cached, use it
-				score = it->second;
-			}
-			else
-			{
-				// Calculate the score and cache it
-				score = user1->FindFriendScore(&user2);
-				scoreCache[key] = score;
-			}
-
-			// Add to the scores vector
-			scores.emplace_back(&user2, score);
+			scores.emplace_back(&user2, user1->FindFriendScore(&user2));
 		}
 	}
 
-	// Step 2: Use partial_sort to sort only the top 5 friend suggestions
-	std::partial_sort(scores.begin(), scores.begin() + 5, scores.end(),
-		[](const auto& a, const auto& b)
-		{
-			return a.second > b.second;  // Sort in descending order by score
-		});
+	std::partial_sort(scores.begin(), scores.begin() + 5, scores.end(), [](const auto& a, const auto& b) { return a.second > b.second; });
 
-	// Step 3: Output the top 5 suggestions
 	_outFile << "SuggestFriends " << identifier1 << std::endl;
 	for (int i = 0; i < 5 && i < scores.size(); i++)
 	{
-		const User* suggestedUser = scores[i].first;
-		_outFile << suggestedUser->GetName() << " [" << suggestedUser->GetIdentifier() << "] - "
-			<< user1->FindNumMutuals(suggestedUser) << " mutual friend(s)" << std::endl;
+		const User* const suggestedUser = scores[i].first;
+		_outFile << suggestedUser->GetName() << " [" << suggestedUser->GetIdentifier() << "] - " << user1->FindNumMutuals(suggestedUser) << " mutual friend(s)" << std::endl;
 	}
 	_outFile << std::endl;
 	return true;
@@ -293,4 +244,3 @@ bool Solution::ListFriends(const std::string& identifier)
 	_outFile << std::endl;
 	return true;
 }
-// Add your code here

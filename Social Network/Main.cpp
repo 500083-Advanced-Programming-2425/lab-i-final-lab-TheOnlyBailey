@@ -55,5 +55,5 @@ int main(int, char**) {
 	}
 
 	std::cin.get(); // wait for a key press
-	return true;
+	return true;// added to satisfy a parasoft error
 }
